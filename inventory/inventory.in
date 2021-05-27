@@ -1,0 +1,23 @@
+[consul1]
+host1 ansible_host=13.67.218.178 ansible_connection=ssh ansible_user=adminuser
+
+[consul2]
+host2 ansible_host=13.67.219.90 ansible_connection=ssh ansible_user=adminuser
+
+[consul3]
+host3 ansible_host=23.99.248.203 ansible_connection=ssh ansible_user=adminuser
+
+[consul4]
+host4 ansible_host=23.99.255.116 ansible_connection=ssh ansible_user=adminuser
+
+[bootstrap:children]
+consul1
+ 
+[server:children]
+consul2
+consul3
+consul4
+ 
+[all:children]
+bootstrap
+server

@@ -1,0 +1,186 @@
+- name: Install Consul
+  hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  tags: [consul]
+  tasks:
+ 
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400
+ 
+    - name: Install dependencies
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - curl
+        - net-tools
+        - zip
+        - unzip
+        - ufw
+      when: ansible_facts['os_family'] == "Debian"
+ 
+    - name: Install consul
+      ansible.builtin.unarchive:
+        src: https://releases.hashicorp.com/consul/1.9.0/consul_1.9.0_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+
+    - name: Ensure group "consul" exists
+      ansible.builtin.shell:
+        cmd: useradd --system --home /etc/consul.d --shell /bin/false consul
+
+- name: Configure files in all nodes
+  hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [files]
+  tasks:
+
+    - name: Create Consul directory
+      file:
+        path: /etc/consul.d
+        state: directory
+        mode: 0755
+
+    - name: Create Consul data directory
+      file:
+        path: /opt/consul
+        state: directory
+        mode: 0755
+
+    - name: Change user and group to consul
+      ansible.builtin.shell:
+        cmd: chown --recursive consul:consul /etc/consul.d
+
+    - name: Change user and group to consul
+      ansible.builtin.shell:
+        cmd: chown --recursive consul:consul /opt/consul
+
+    - name: Open port 8301
+      community.general.ufw:
+        rule: allow
+        port: '8301'
+        proto: tcp
+
+    - name: Copy systemd consul.service
+      copy:
+        src: ../config/consul.service
+        dest: /etc/systemd/system/consul.service
+
+- name: Configure host 1
+  hosts: consul1
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [host1]
+  tasks:
+
+    - name: Copy consul.hcl
+      copy:
+        src: ../config/consul1.hcl
+        dest: /etc/consul.d/consul.hcl
+    
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl daemon-reload
+
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl enable consul.service
+    
+- name: Configure host 2
+  hosts: consul2
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [host2]
+  tasks:
+
+    - name: Copy consul.hcl
+      copy:
+        src: ../config/consul2.hcl
+        dest: /etc/consul.d/consul.hcl
+
+    - name: Copy server.hcl
+      copy:
+        src: ../config/server.hcl
+        dest: /etc/consul.d/server.hcl
+ 
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl daemon-reload
+
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl enable consul.service
+
+- name: Configure host 3
+  hosts: consul3
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [host3]
+  tasks:
+
+    - name: Copy consul.hcl
+      copy:
+        src: ../config/consul3.hcl
+        dest: /etc/consul.d/consul.hcl
+
+    - name: Copy server.hcl
+      copy:
+        src: ../config/server.hcl
+        dest: /etc/consul.d/server.hcl
+ 
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl daemon-reload
+
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl enable consul.service
+
+- name: Configure host 4
+  hosts: consul4
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [host4]
+  tasks:
+
+    - name: Copy consul.hcl
+      copy:
+        src: ../config/consul4.hcl
+        dest: /etc/consul.d/consul.hcl
+
+    - name: Copy server.hcl
+      copy:
+        src: ../config/server.hcl
+        dest: /etc/consul.d/server.hcl
+ 
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl daemon-reload
+
+    - name: Join with other nodes
+      ansible.builtin.shell:
+        cmd: systemctl enable consul.service
+
+- name: Configure host 4
+  hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [starting]
+  tasks:
+
+    - name: Start Consul service
+      systemd:
+        name: consul.service
+        state: started
