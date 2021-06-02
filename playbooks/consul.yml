@@ -86,11 +86,11 @@
         src: ../config/consul1.hcl
         dest: /etc/consul.d/consul.hcl
     
-    - name: Join with other nodes
+    - name: Reload daemon
       ansible.builtin.shell:
         cmd: systemctl daemon-reload
 
-    - name: Join with other nodes
+    - name: Enable consul
       ansible.builtin.shell:
         cmd: systemctl enable consul.service
     
@@ -112,11 +112,11 @@
         src: ../config/server.hcl
         dest: /etc/consul.d/server.hcl
  
-    - name: Join with other nodes
+    - name: Reload daemon
       ansible.builtin.shell:
         cmd: systemctl daemon-reload
 
-    - name: Join with other nodes
+    - name: Enable consul service
       ansible.builtin.shell:
         cmd: systemctl enable consul.service
 
@@ -138,11 +138,11 @@
         src: ../config/server.hcl
         dest: /etc/consul.d/server.hcl
  
-    - name: Join with other nodes
+    - name: Reload daemon
       ansible.builtin.shell:
         cmd: systemctl daemon-reload
 
-    - name: Join with other nodes
+    - name: Enable consul service
       ansible.builtin.shell:
         cmd: systemctl enable consul.service
 
@@ -164,11 +164,11 @@
         src: ../config/server.hcl
         dest: /etc/consul.d/server.hcl
  
-    - name: Join with other nodes
+    - name: Reload daemon
       ansible.builtin.shell:
         cmd: systemctl daemon-reload
 
-    - name: Join with other nodes
+    - name: Enable consul service
       ansible.builtin.shell:
         cmd: systemctl enable consul.service
 

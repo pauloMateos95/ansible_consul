@@ -1,4 +1,4 @@
-datacenter = "paulo"
+datacenter = "dc1"
 data_dir = "/opt/consul"
 log_level = "INFO"
 bind_addr = "10.0.2.7"
